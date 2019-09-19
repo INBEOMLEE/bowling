@@ -135,7 +135,7 @@
 							<td id="pins<c:out value="${status.index}"/>90" class="pins_box" style="width: 4%"></td>
 							<td id="pins<c:out value="${status.index}"/>91" class="pins_box" style="width: 4%"></td>
 							<td id="pins<c:out value="${status.index}"/>92" class="pins_box" style="width: 4%"></td>
-							<td rowspan="2" class="total<c:out value="${status.index}"/>"></td>
+							<td rowspan="2" id="total_score<c:out value="${status.index}"/>"></td>
 						</tr>
 						<tr>
 							<td colspan="2" class="frame<c:out value="${status.index}"/>-0"></td>
@@ -156,19 +156,19 @@
 		<div class="error_message">한 프레임에 두번의 투구가 10점을 넘을 수 없습니다.</div>
 		<div class="score_box_outline">
 			<div class="score_box">
-				<button class="score">0</button>
-				<button class="score">1</button>
-				<button class="score">2</button>
-				<button class="score">3</button>
-				<button class="score">4</button>
-				<button class="score">5</button>
-				<button class="score">6</button>
-				<button class="score">7</button>
-				<button class="score">8</button>
-				<button class="score">9</button>
-				<button class="score">10</button>
-				<button class="command">CE</button>
-				<button class="command">AC</button>
+				<button class="score_btn">0</button>
+				<button class="score_btn">1</button>
+				<button class="score_btn">2</button>
+				<button class="score_btn">3</button>
+				<button class="score_btn">4</button>
+				<button class="score_btn">5</button>
+				<button class="score_btn">6</button>
+				<button class="score_btn">7</button>
+				<button class="score_btn">8</button>
+				<button class="score_btn">9</button>
+				<button class="score_btn">10</button>
+				<button class="command_btn">CE</button>
+				<button class="command_btn">AC</button>
 			</div>
 		</div>
 	</div>
@@ -180,120 +180,159 @@
 		var curPlayer = 0;
 		var curFrame = 0;
 		var curRoll = 0;
-		var endCheck = 0;
+		var theEnd = 0;
+		var flag = 0;
 		
-		
-		$('.score').click(function(){
+		$('.score_btn').click(function(){
 			var curPins = $(this).text();
+			bowlingAction(curPins);
 			
+			if(theEnd == 1){
+				getFinalScore();
+			}
+		});
+		
+		function bowlingAction(curPins){		
 			$.ajax({
 				type:"post",
 				url: "${path}/bowling/setScore",
+				async: false,
 				dataType: "text",
 				data: "curPlayer=" + curPlayer + "&curFrame=" + curFrame + "&curRoll=" + curRoll + "&curPins=" + curPins,
 				success: function(){
-					/* alert("curPlayer : " + curPlayer + ", curFrame : " + curFrame + ", curRoll : " + curRoll); */
-					
 					// 점수 입력 부분
-					if(curRoll == 1 && Number($('#pins'+curPlayer+curFrame+(curRoll-1)).text()) + Number(curPins) == 10) {
-						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('/');
-					} else if(curPins == 10) {
-						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('X');
-					} else {
-						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text(curPins);
-					}
+					setScore(curPins);
 					
 					// 다음 순서 처리 부분
-					if(curFrame < 9) {
-						if(curPins == 10) {
-							if(curPlayer == player){
-								curPlayer = 0;
-								curFrame++;
-								curRoll = 0;
-							} else {
-								curPlayer++;
-								curRoll = 0;
-							}
-						} else {
-							if(curRoll == 1) {
-								if(curPlayer == player){
-									curPlayer = 0;
-									curFrame++;
-									curRoll = 0;
-								} else {
-									curPlayer++;
-									curRoll = 0;
-								}
-							} else {
-								curRoll++;
-							}
-						}
-					} else {
-						if(curRoll == 1 && Number($('#pins'+curPlayer+'90').text()) + Number(curPins) < 10) {
-							if(curPlayer == player) {
-								$('.score').css('visibility', 'hidden');
-								$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
-								endCheck = 1;
-							} else {
-								curPlayer++;
-								curRoll = 0;
-							}
-						} else if(curRoll == 2) {
-							if(curPlayer == player) {
-								$('.score').css('visibility', 'hidden');
-								$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
-								endCheck = 1;
-							} else {
-								curPlayer++;
-								curRoll = 0;
-							}
-						} else {
-							curRoll++;
-						}
-					}
-					
-					// 다음 순서 배경색 설정
-					if(endCheck != 1){
-						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'red');
-					}
+					setNextTrun(curPins);
 					
 					// 점수 버튼 활성화 처리
-					if(curFrame < 9 && curRoll == 1) {
-						var nextRollRange = 10 - curPins;
-						for (var i = nextRollRange; i < 11; i++) {
-							$('.score').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
-						}
-					} else {
-						$('.score').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
-					}
-					
-					if(curFrame == 9 && curRoll == 1) {
-						if(curPins == 10) {
-							$('.score').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
-						} else {
-							var nextRollRange = 10 - curPins;
-							for (var i = nextRollRange; i < 11; i++) {
-								$('.score').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
-							}
-						}
-					}
-					
-					if(curFrame == 9 && curRoll == 2) {
-						if($('#pins'+curPlayer+'90').text() == 10 && curPins != 10) {
-							var nextRollRange = 10 - curPins;
-							for (var i = nextRollRange; i < 11; i++) {
-								$('.score').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
-							}
-						} else {
-							$('.score').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
-						}				
-					}
+					setRollRange(curPins);
 				},
 				error: function(){
 					
 				}
 			});	
-		});
+		}
+		
+		function setScore(curPins){
+			if(curRoll == 1 && Number($('#pins'+curPlayer+curFrame+(curRoll-1)).text()) + Number(curPins) == 10) {
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('/');
+			} else if(curPins == 10) {
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('X');
+			} else {
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text(curPins);
+			}
+		}
+		
+		function setNextTrun(curPins){
+			if(curFrame < 9) {
+				if(curPins == 10) {
+					if(curPlayer == player){
+						curPlayer = 0;
+						curFrame++;
+						curRoll = 0;
+					} else {
+						curPlayer++;
+						curRoll = 0;
+					}
+				} else {
+					if(curRoll == 1) {
+						if(curPlayer == player){
+							curPlayer = 0;
+							curFrame++;
+							curRoll = 0;
+						} else {
+							curPlayer++;
+							curRoll = 0;
+						}
+					} else {
+						curRoll++;
+					}
+				}
+			} else {
+				if(curRoll == 1 && Number($('#pins'+curPlayer+'90').text()) + Number(curPins) < 10) {
+					if(curPlayer == player) {
+						$('.score_btn').css('visibility', 'hidden');
+						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
+						curPlayer++;
+						flag = 1;
+					} else {
+						curPlayer++;
+						curRoll = 0;
+					}
+					
+					theEnd = 1;
+				} else if(curRoll == 2) {
+					if(curPlayer == player) {
+						$('.score_btn').css('visibility', 'hidden');
+						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
+						curPlayer++;
+						flag = 1;
+					} else {
+						curPlayer++;
+						curRoll = 0;
+					}
+					
+					theEnd = 1;
+				} else {
+					curRoll++;
+				}
+			}
+			
+			if(flag != 1){
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'red');
+			}
+		}
+		
+		function setRollRange(curPins){
+			if(curFrame < 9 && curRoll == 1) {
+				var nextRollRange = 10 - curPins;
+				for (var i = nextRollRange; i < 11; i++) {
+					$('.score_btn').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
+				}
+			} else {
+				$('.score_btn').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
+			}
+			
+			if(curFrame == 9 && curRoll == 1) {
+				if(curPins == 10) {
+					$('.score_btn').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
+				} else {
+					var nextRollRange = 10 - curPins;
+					for (var i = nextRollRange; i < 11; i++) {
+						$('.score_btn').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
+					}
+				}
+			}
+			
+			if(curFrame == 9 && curRoll == 2) {
+				if($('#pins'+curPlayer+'90').text() == 10 && curPins != 10) {
+					var nextRollRange = 10 - curPins;
+					for (var i = nextRollRange; i < 11; i++) {
+						$('.score_btn').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
+					}
+				} else {
+					$('.score_btn').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
+				}				
+			}
+		}
+		
+		function getFinalScore() {
+			$.ajax({
+				type:"post",
+				url: "${path}/bowling/getFinalScore",
+				dataType: "text",
+				data: "curPlayer=" + (curPlayer-1),
+				success: function(finalScore){
+					$('#total_score'+(curPlayer-1)).text(finalScore);
+					theEnd = 0;
+				},
+				error: function(){
+					
+				}
+			});	
+		}
 	});
 
 </script>

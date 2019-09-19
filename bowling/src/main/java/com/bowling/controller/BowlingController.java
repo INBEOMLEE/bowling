@@ -51,8 +51,12 @@ public class BowlingController {
 	@ResponseBody
 	@RequestMapping(value="/setScore", method = RequestMethod.POST)
 	public void setScore(int curPlayer, int curFrame, int curRoll, int curPins) {
-		
 		service.setScore(curPlayer, curFrame, curRoll, curPins);
-		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/getFinalScore", method = RequestMethod.POST)
+	public int getFinalScore(int curPlayer) {
+		return service.getFinalScore(curPlayer);
 	}
 }

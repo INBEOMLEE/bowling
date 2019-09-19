@@ -5,18 +5,14 @@ import java.util.HashMap;
 import org.springframework.stereotype.Service;
 
 import com.bowling.Bowling;
+import com.bowling.ScoreBoard;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class BowlingServiceImpl implements BowlingService{
-	// 출력을 위해 모든 투구의 점수를 담을 배열
-	private int[][][] pinsByPlayer = new int[4][10][3];
-	// 플레이어 별 최종 점수를 담을 배열
-	private int[][] scoreByPlayer = new int[4][21];
-	// 플레이어 별 최종 점수를 담을 배열
-	private int[] seqByPlayer = new int[4];
+	ScoreBoard scoreBoard = new ScoreBoard();
 	
 	@Override
 	public void setScoreboard(int player) {
@@ -27,24 +23,15 @@ public class BowlingServiceImpl implements BowlingService{
 	public HashMap<String, Object> setScore(int curPlayer, int curFrame, int curRoll, int curPins) {
 		HashMap<String, Object> map = new HashMap<>();
 		
-		System.out.println("setScore :: pinsByPlayer [" + curPlayer + "] " + "[" + curFrame + "] " + "[" + curRoll + "] = " + curPins);
-		
-		pinsByPlayer[curPlayer][curFrame][curRoll] = curPins;
-		
-		System.out.println("시퀀스 확인 " + seqByPlayer[curPlayer]);
-		
-		scoreByPlayer[curPlayer][seqByPlayer[curPlayer]++] = curPins;
-		
-		System.out.println("확인 0 > " + scoreByPlayer[curPlayer][0]);
-		System.out.println("확인 1 > " + scoreByPlayer[curPlayer][1]);
+		scoreBoard.setScore(curPlayer, curFrame, curRoll, curPins);
+		scoreBoard.roll(curPlayer, curPins);
 
 		return map;
 	}
 
 	@Override
-	public HashMap<String, Object> roll(String input) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getFinalScore(int curPlayer) {
+		return scoreBoard.getFinalScore(curPlayer);
 	}
 	
 	
