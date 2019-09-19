@@ -42,6 +42,10 @@
 		border-spacing: 0px;
 	}
 	
+	.scoreboard th {
+		font-size: 20px;
+	}
+	
 	.scoreboard th, td {
 		border: 1px solid white;
 	}
@@ -59,19 +63,20 @@
 	}
 	
 	.score_box button {
-		border: 2px solid red;
 		padding: 20px 30px;
 		font-size: 18px;
-		font-weight: 600;
+		font-weight: 600; 
 		background: white;
 		color: black;
 		border-radius: 20px;
 		cursor: pointer;
+		box-shadow: 5px 5px 5px black;
 		outline: none;
+		border: none;
+		color: #353535;
 	}
 	
 	.scoreboard td {
-		font-size: 20px;
 		font-weight: 600;
 		text-align: center; 	
 	}
@@ -113,7 +118,7 @@
 				<tbody>
 					<c:forEach items="${list}" var="name" varStatus="status">
 						<tr>
-							<td rowspan="2" style="text-align: center">${name}</td>
+							<td rowspan="2" style="text-align: center; font-size: 25px;">${name}</td>
 							<td id="pins<c:out value="${status.index}"/>00" class="pins_box" style="width: 4%"></td>
 							<td id="pins<c:out value="${status.index}"/>01" class="pins_box" style="width: 4%"></td>
 							<td id="pins<c:out value="${status.index}"/>10" class="pins_box" style="width: 4%"></td>
@@ -138,16 +143,16 @@
 							<td rowspan="2" id="total_score<c:out value="${status.index}"/>"></td>
 						</tr>
 						<tr>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-0"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-1"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-2"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-3"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-4"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-5"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-6"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-7"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>-8"></td>
-							<td colspan="3" class="frame<c:out value="${status.index}"/>-9"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>0"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>1"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>2"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>3"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>4"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>5"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>6"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>7"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>8"></td>
+							<td colspan="3" class="frame<c:out value="${status.index}"/>9"></td>
 						</tr>
 					</c:forEach>				
 				</tbody>
@@ -176,6 +181,8 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
+		arrayReset();
+		
 		var player = "${player}" - 1;
 		var curPlayer = 0;
 		var curFrame = 0;
@@ -192,6 +199,19 @@
 			}
 		});
 		
+		function arrayReset() {
+			$.ajax({
+				type:"post",
+				url: "${path}/bowling/arrayReset",
+				success: function(){
+					console.log('AJAX SUCCESS : ARRAY RESET');
+				},
+				error: function(){
+					console.log('AJAX FAIL : ARRAY RESET');
+				}
+			});	
+		}
+		
 		function bowlingAction(curPins){		
 			$.ajax({
 				type:"post",
@@ -200,8 +220,13 @@
 				dataType: "text",
 				data: "curPlayer=" + curPlayer + "&curFrame=" + curFrame + "&curRoll=" + curRoll + "&curPins=" + curPins,
 				success: function(){
+					console.log('AJAX SUCCESS : BOWLING ACTION');
+					
 					// 점수 입력 부분
 					setScore(curPins);
+					
+					// 프레임 점수 입력 부분
+					getFrameScore();
 					
 					// 다음 순서 처리 부분
 					setNextTrun(curPins);
@@ -210,19 +235,40 @@
 					setRollRange(curPins);
 				},
 				error: function(){
-					
+					console.log('AJAX FAIL : BOWLING ACTION');
 				}
 			});	
 		}
 		
 		function setScore(curPins){
 			if(curRoll == 1 && Number($('#pins'+curPlayer+curFrame+(curRoll-1)).text()) + Number(curPins) == 10) {
-				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('/');
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').css('font-size', '30px').text('/');
 			} else if(curPins == 10) {
-				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('X');
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').css('font-size', '30px').text('X');
 			} else {
-				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text(curPins);
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').css('font-size', '25px').text(curPins);
 			}
+		}
+		
+		function getFrameScore(){
+			$.ajax({
+				type:"post",
+				url: "${path}/bowling/getFrameScore",
+				async : false,
+				dataType: "json",
+				data: "curPlayer=" + curPlayer,
+				success: function(data){
+					console.log('AJAX SUCCESS : GET FRAME SCORE');
+					for (var i = 0; i < data.length; i++) {
+						for (var j = 0; j < data[i].length; j++) {
+							$('.frame'+i+j).text(data[i][j]);
+						}
+					}
+				},
+				error: function(){
+					console.log('AJAX FAIL : GET FRAME SCORE');
+				}
+			});	
 		}
 		
 		function setNextTrun(curPins){
@@ -289,19 +335,19 @@
 			if(curFrame < 9 && curRoll == 1) {
 				var nextRollRange = 10 - curPins;
 				for (var i = nextRollRange; i < 11; i++) {
-					$('.score_btn').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
+					$('.score_btn').eq(i+1).css('background', '#353535').css('box-shadow', 'none').attr('disabled', true).css('cursor', 'default');
 				}
 			} else {
-				$('.score_btn').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
+				$('.score_btn').css('background', 'white').css('box-shadow', '7px 7px 7px black').attr('disabled', false).css('cursor', 'pointer');
 			}
 			
 			if(curFrame == 9 && curRoll == 1) {
 				if(curPins == 10) {
-					$('.score_btn').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
+					$('.score_btn').css('background', 'white').css('box-shadow', '7px 7px 7px black').attr('disabled', false).css('cursor', 'pointer');
 				} else {
 					var nextRollRange = 10 - curPins;
 					for (var i = nextRollRange; i < 11; i++) {
-						$('.score_btn').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
+						$('.score_btn').eq(i+1).css('background', '#353535').css('box-shadow', 'none').attr('disabled', true).css('cursor', 'default');
 					}
 				}
 			}
@@ -310,10 +356,10 @@
 				if($('#pins'+curPlayer+'90').text() == 10 && curPins != 10) {
 					var nextRollRange = 10 - curPins;
 					for (var i = nextRollRange; i < 11; i++) {
-						$('.score_btn').eq(i+1).css('background', '#353535').css('color', '#353535').attr('disabled', true).css('cursor', 'default');
+						$('.score_btn').eq(i+1).css('background', '#353535').attr('disabled', true).css('cursor', 'default');
 					}
 				} else {
-					$('.score_btn').css('background', 'white').css('color', '#353535').attr('disabled', false).css('cursor', 'pointer');
+					$('.score_btn').css('background', 'white').attr('disabled', false).css('cursor', 'pointer');
 				}				
 			}
 		}
@@ -325,11 +371,12 @@
 				dataType: "text",
 				data: "curPlayer=" + (curPlayer-1),
 				success: function(finalScore){
-					$('#total_score'+(curPlayer-1)).text(finalScore);
+					console.log('AJAX SUCCESS : GET FINAL SCORE');
+					$('#total_score'+(curPlayer-1)).css('font-size', '25px').text(finalScore);
 					theEnd = 0;
 				},
 				error: function(){
-					
+					console.log('AJAX FAIL : GET FINAL SCORE');
 				}
 			});	
 		}

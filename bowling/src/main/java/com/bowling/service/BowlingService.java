@@ -10,4 +10,8 @@ public interface BowlingService {
 
 	public int getFinalScore(int curPlayer);
 
+	public void arrayReset();
+
+	public int[][] getFrameScore(int curPlayer);
+
 }

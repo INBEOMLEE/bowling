@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.springframework.stereotype.Service;
 
-import com.bowling.Bowling;
 import com.bowling.ScoreBoard;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,12 @@ public class BowlingServiceImpl implements BowlingService{
 	
 	@Override
 	public void setScoreboard(int player) {
-		
+		scoreBoard.setScoreBoard(player);
+	}
+	
+	@Override
+	public void arrayReset() {
+		scoreBoard.arrayReset();
 	}
 	
 	@Override
@@ -28,11 +32,20 @@ public class BowlingServiceImpl implements BowlingService{
 
 		return map;
 	}
+	
+	@Override
+	public int[][] getFrameScore(int curPlayer) {
+		return scoreBoard.getFrameScore(curPlayer);
+	}
 
 	@Override
 	public int getFinalScore(int curPlayer) {
 		return scoreBoard.getFinalScore(curPlayer);
 	}
+
+	
+
+	
 	
 	
 	

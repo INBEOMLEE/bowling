@@ -49,9 +49,21 @@ public class BowlingController {
 	}
 	
 	@ResponseBody
+	@RequestMapping(value="/arrayReset", method = RequestMethod.POST)
+	public void arrayReset() {
+		service.arrayReset();
+	}
+	
+	@ResponseBody
 	@RequestMapping(value="/setScore", method = RequestMethod.POST)
 	public void setScore(int curPlayer, int curFrame, int curRoll, int curPins) {
 		service.setScore(curPlayer, curFrame, curRoll, curPins);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/getFrameScore", method = RequestMethod.POST)
+	public int[][] getFrameScore(int curPlayer) {
+		return service.getFrameScore(curPlayer);
 	}
 	
 	@ResponseBody
