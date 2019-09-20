@@ -261,7 +261,11 @@
 					console.log('AJAX SUCCESS : GET FRAME SCORE');
 					for (var i = 0; i < data.length; i++) {
 						for (var j = 0; j < data[i].length; j++) {
-							$('.frame'+i+j).text(data[i][j]);
+							if(data[i][j] == '-1') {
+								$('.frame'+i+j).text("");
+							} else {
+								$('.frame'+i+j).text(data[i][j]);
+							}
 						}
 					}
 				},
