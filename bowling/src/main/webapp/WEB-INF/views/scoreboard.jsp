@@ -199,6 +199,37 @@
 			}
 		});
 		
+		$('.command_btn').click(function(){
+			var text = $(this).text();
+			if(text == "CE") {
+				$.ajax({
+					type:"post",
+					url: "${path}/bowling/clearEntry",
+					async: false,
+					success: function(data){
+						if(data == null || data == ""){
+							curPlayer = 0;
+							curFrame = 0;
+							curRoll = 0;
+						} else {
+							curPlayer = data.curPlayer;
+							curFrame = data.curFrame;
+							curRoll = data.curRoll;
+							
+							$('#pins'+curPlayer+curFrame+curRoll).text("");
+							getFrameScore();
+							setRollRange(data.prePins);
+						}
+						
+					},
+					error: function(){
+						console.log('AJAX FAIL : ARRAY RESET');
+					}
+				});
+			}
+			
+			
+		});		
 		function arrayReset() {
 			$.ajax({
 				type:"post",

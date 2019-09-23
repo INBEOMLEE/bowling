@@ -1,26 +1,29 @@
 package com.bowling;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class ScoreBoard {
 	private final int MAX_ALLFRAME_ROLL = 21;
 	private final int MAX_FRAME_ROLL = 3;
+	private final int MAX_PLAYER = 4;
 	private final int MAX_FRAME = 10;
 	
 	// 출력을 위해 모든 투구의 점수를 담을 배열
-	private int[][][] pinsByPlayer = null;
+	private int[][][] pinsByPlayer = new int[MAX_PLAYER][MAX_FRAME][MAX_FRAME_ROLL];
 	// 플레이어 별 최종 점수를 담을 배열
-	private int[][] scoreByPlayer = null;
+	private int[][] scoreByPlayer = new int[MAX_PLAYER][MAX_ALLFRAME_ROLL];
 	// 플레이어 별 프레임 점수를 담을 배열
-	private int[][] scoreByFrame = null;
+	private int[][] scoreByFrame = new int[MAX_PLAYER][MAX_FRAME];
 	// 플레이어 별 투구의 횟수를 담을 배열
-	private int[] seqByPlayer = null;
-	private int[] seqOfPlayer = null;
+	private int[] seqByPlayer = new int[MAX_PLAYER];
+	
+	List<HashMap<String, Object>> list = new ArrayList<>();
 	
 	public void setScoreBoard(int player) {
-		pinsByPlayer = new int[player][MAX_FRAME][MAX_FRAME_ROLL];
-		scoreByPlayer = new int[player][MAX_ALLFRAME_ROLL];
-		scoreByFrame = new int[player][MAX_FRAME];
-		seqByPlayer = new int[player];
-		seqOfPlayer = new int[player];
+
+	
 	}
 	
 	public void arrayReset() {
@@ -48,6 +51,8 @@ public class ScoreBoard {
 			seqByPlayer[i] = 0;
 		}
 		
+		list.clear();
+		
 	}
 
 	public void setScore(int curPlayer, int curFrame, int curRoll, int curPins) {
@@ -60,6 +65,49 @@ public class ScoreBoard {
 		scoreByPlayer[curPlayer][seqByPlayer[curPlayer]++] = curPins;
 	}
 	
+	public void recordEntry(int curPlayer, int curFrame, int curRoll) {
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("curPlayer", curPlayer);
+		map.put("curFrame", curFrame);
+		map.put("curRoll", curRoll);
+		
+		list.add(map);
+	}
+	
+	public HashMap<String, Object> clearEntry() {
+		if(list.size() == 0) {
+			return null;
+		}
+		
+		HashMap<String, Object> map = new HashMap<>();
+		
+		int curPlayer = (int) list.get(list.size()-1).get("curPlayer");
+		int curFrame = (int) list.get(list.size()-1).get("curFrame");
+		int curRoll = (int) list.get(list.size()-1).get("curRoll");
+		
+		pinsByPlayer[curPlayer][curFrame][curRoll] = -1;
+		scoreByPlayer[curPlayer][seqByPlayer[curPlayer]-1] = 0;
+		seqByPlayer[curPlayer]--;
+		list.remove(list.size()-1);
+		
+		map.put("curPlayer", curPlayer);
+		map.put("curFrame", curFrame);
+		map.put("curRoll", curRoll);
+		
+		if(list.size() == 0) {
+			return map;
+		}
+		
+		int prePlayer = (int) list.get(list.size()-1).get("curPlayer");
+		int preFrame = (int) list.get(list.size()-1).get("curFrame");
+		int preRoll = (int) list.get(list.size()-1).get("curRoll");
+		
+		int prePins = pinsByPlayer[prePlayer][preFrame][preRoll];
+		
+		map.put("prePins", prePins);
+		
+		return map;
+	}
 	public int getFinalScore(int curPlayer) {
 		int score = 0;
 		int firstRollInFrame = 0;
@@ -77,101 +125,62 @@ public class ScoreBoard {
 			}
 		}
 		
-		System.out.println("getFinalScore :: " + (curPlayer+1) + "번째 플레이어 총 점수 = " + score);
-		
 		return score;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	public int[][] getFrameScore(int curPlayer) {
-		if(seqOfPlayer[curPlayer] == 0) {
-			if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] == 10 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] == 10 && (pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+2][0] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+2][0];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] == 10 && (pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][1] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][1];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] == 10 && (pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != 10 && (pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1];
-			} 
-		} else
-		
-		if(seqOfPlayer[curPlayer] < 8 ) {
-			if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] == 10 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] == 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+2][0] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+2][0];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] == 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][1] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][1];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] == 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1];
-			} 
-		} else
+		for (int frame = 0; frame < MAX_FRAME; frame++) {
+			if(frame == 0) {
+				if(pinsByPlayer[curPlayer][frame][0] == 10 && pinsByPlayer[curPlayer][frame+1][0] == 10 && (pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1 && pinsByPlayer[curPlayer][frame+2][0] != -1)) {
+					scoreByFrame[curPlayer][frame] = pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame+1][0] + pinsByPlayer[curPlayer][frame+2][0];
+				} else if(pinsByPlayer[curPlayer][frame][0] == 10 && (pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1 && pinsByPlayer[curPlayer][frame+1][1] != -1)) {
+					scoreByFrame[curPlayer][frame] = pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame+1][0] + pinsByPlayer[curPlayer][frame+1][1];
+				} else if(pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] == 10 && (pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame][1] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1)) {
+					scoreByFrame[curPlayer][frame] = pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] + pinsByPlayer[curPlayer][frame+1][0];
+				} else if(pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] != 10 && (pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame][1] != -1)) {
+					scoreByFrame[curPlayer][frame] = pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1];
+				} else {
+					scoreByFrame[curPlayer][frame] = -1;
+				}
+			} else
 			
-		if(seqOfPlayer[curPlayer] == 8) {
-			if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] == 10 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] == 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][1] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][1];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] == 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][1] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][1];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] == 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]+1][0];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1];
-			} 
-		} else
-		
-		if(seqOfPlayer[curPlayer] == 9) {
-			if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] >= 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][2] != -1)) {
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][2];
-			} else if(pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] < 10 && (scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] != -1 && pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1] != -1)){
-				scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] = scoreByFrame[curPlayer][seqOfPlayer[curPlayer]-1] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][0] + pinsByPlayer[curPlayer][seqOfPlayer[curPlayer]][1];
-			} 
-		}
-		
-		if(scoreByFrame[curPlayer][seqOfPlayer[curPlayer]] != -1) {
-			seqOfPlayer[curPlayer]++;
+			if(frame < 8 ) {
+				if(pinsByPlayer[curPlayer][frame][0] == 10 && pinsByPlayer[curPlayer][frame+1][0] == 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1 && pinsByPlayer[curPlayer][frame+2][0] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame+1][0] + pinsByPlayer[curPlayer][frame+2][0];
+				} else if(pinsByPlayer[curPlayer][frame][0] == 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1 && pinsByPlayer[curPlayer][frame+1][1] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame+1][0] + pinsByPlayer[curPlayer][frame+1][1];
+				} else if(pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] == 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame][1] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] + pinsByPlayer[curPlayer][frame+1][0];
+				} else if(pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] != 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame][1] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1];
+				} else {
+					scoreByFrame[curPlayer][frame] = -1;
+				}
+			} else
+				
+			if(frame == 8) {
+				if(pinsByPlayer[curPlayer][frame][0] == 10 && pinsByPlayer[curPlayer][frame+1][0] == 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1 && pinsByPlayer[curPlayer][frame+1][1] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame+1][0] + pinsByPlayer[curPlayer][frame+1][1];
+				} else if(pinsByPlayer[curPlayer][frame][0] == 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1 && pinsByPlayer[curPlayer][frame+1][1] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame+1][0] + pinsByPlayer[curPlayer][frame+1][1];
+				} else if(pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] == 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame][1] != -1 && pinsByPlayer[curPlayer][frame+1][0] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] + pinsByPlayer[curPlayer][frame+1][0];
+				} else if(pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] != 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame][1] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1];
+				} else {
+					scoreByFrame[curPlayer][frame] = -1;
+				}
+			} else
+			
+			if(frame == 9) {
+				if(pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] >= 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame][1] != -1 && pinsByPlayer[curPlayer][frame][2] != -1)) {
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] + pinsByPlayer[curPlayer][frame][2];
+				} else if(pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1] < 10 && (scoreByFrame[curPlayer][frame-1] != -1 && pinsByPlayer[curPlayer][frame][0] != -1 && pinsByPlayer[curPlayer][frame][1] != -1)){
+					scoreByFrame[curPlayer][frame] = scoreByFrame[curPlayer][frame-1] + pinsByPlayer[curPlayer][frame][0] + pinsByPlayer[curPlayer][frame][1];
+				} else {
+					scoreByFrame[curPlayer][frame] = -1;
+				}
+			}
 		}
 			
 		return scoreByFrame;
@@ -196,4 +205,8 @@ public class ScoreBoard {
 	public int nextBallsForFrame(int curPlayer, int firstRollInFrame) {
 		return scoreByPlayer[curPlayer][firstRollInFrame] + scoreByPlayer[curPlayer][firstRollInFrame + 1];
 	}
+
+	
+
+	
 }

@@ -71,4 +71,10 @@ public class BowlingController {
 	public int getFinalScore(int curPlayer) {
 		return service.getFinalScore(curPlayer);
 	}
+	
+	@ResponseBody
+	@RequestMapping(value="/clearEntry", method = RequestMethod.POST)
+	public HashMap<String, Object> clearEntry() {
+		return service.clearEntry();
+	}
 }

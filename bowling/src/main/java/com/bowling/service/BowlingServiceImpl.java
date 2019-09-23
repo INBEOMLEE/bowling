@@ -2,9 +2,12 @@ package com.bowling.service;
 
 import java.util.HashMap;
 
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Service;
 
 import com.bowling.ScoreBoard;
+import com.bowling.dao.BowlingDAO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class BowlingServiceImpl implements BowlingService{
 	ScoreBoard scoreBoard = new ScoreBoard();
+	
+	@Inject
+	BowlingDAO bowlingDAO;
 	
 	@Override
 	public void setScoreboard(int player) {
@@ -29,7 +35,8 @@ public class BowlingServiceImpl implements BowlingService{
 		
 		scoreBoard.setScore(curPlayer, curFrame, curRoll, curPins);
 		scoreBoard.roll(curPlayer, curPins);
-
+		scoreBoard.recordEntry(curPlayer, curFrame, curRoll);
+		
 		return map;
 	}
 	
@@ -41,6 +48,11 @@ public class BowlingServiceImpl implements BowlingService{
 	@Override
 	public int getFinalScore(int curPlayer) {
 		return scoreBoard.getFinalScore(curPlayer);
+	}
+
+	@Override
+	public HashMap<String, Object> clearEntry() {
+		return scoreBoard.clearEntry();
 	}
 
 	

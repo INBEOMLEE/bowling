@@ -14,4 +14,6 @@ public interface BowlingService {
 
 	public int[][] getFrameScore(int curPlayer);
 
+	public HashMap<String, Object> clearEntry();
+
 }
