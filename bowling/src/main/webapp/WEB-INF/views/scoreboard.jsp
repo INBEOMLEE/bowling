@@ -207,6 +207,14 @@
 					url: "${path}/bowling/clearEntry",
 					async: false,
 					success: function(data){
+						$('#pins'+curPlayer+curFrame+curRoll).css("background", "none");
+						$('.score_btn').css('visibility', 'visible');
+						$('#total_score'+(curPlayer)).css('font-size', '25px').text("");
+						
+						/* curPlayer++; 해준부분과 꼬여서 지금 마지막 점수 지워지는게 비정상적이다. */
+						theEnd = 0;
+						flag = 0;
+						
 						if(data == null || data == ""){
 							curPlayer = 0;
 							curFrame = 0;
@@ -216,14 +224,15 @@
 							curFrame = data.curFrame;
 							curRoll = data.curRoll;
 							
-							$('#pins'+curPlayer+curFrame+curRoll).text("");
 							getFrameScore();
+							$('#pins'+curPlayer+curFrame+curRoll).css("background", "red").text("");
+							
 							setRollRange(data.prePins);
 						}
 						
 					},
 					error: function(){
-						console.log('AJAX FAIL : ARRAY RESET');
+						console.log('AJAX FAIL : clearEntry');
 					}
 				});
 			}
