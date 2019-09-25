@@ -10,20 +10,19 @@ public class ScoreBoard {
 	private final int MAX_PLAYER = 4;
 	private final int MAX_FRAME = 10;
 	
-	// 출력을 위해 모든 투구의 점수를 담을 배열
+	// 프레임 점수를 계산하기 위한 배열
 	private int[][][] pinsByPlayer = new int[MAX_PLAYER][MAX_FRAME][MAX_FRAME_ROLL];
-	// 플레이어 별 최종 점수를 담을 배열
+	// 최종 점수를 계산하기 위한 배열
 	private int[][] scoreByPlayer = new int[MAX_PLAYER][MAX_ALLFRAME_ROLL];
-	// 플레이어 별 프레임 점수를 담을 배열
+	// 프레임 점수를 반환 할 배열
 	private int[][] scoreByFrame = new int[MAX_PLAYER][MAX_FRAME];
-	// 플레이어 별 투구의 횟수를 담을 배열
+	// sequence 역할을 할 배열
 	private int[] seqByPlayer = new int[MAX_PLAYER];
-	
+	// 투구 순서를 담을 프레임 워크
 	List<HashMap<String, Object>> list = new ArrayList<>();
 	
 	public void setScoreBoard(int player) {
-
-	
+		
 	}
 	
 	public void arrayReset() {
@@ -56,8 +55,6 @@ public class ScoreBoard {
 	}
 
 	public void setScore(int curPlayer, int curFrame, int curRoll, int curPins) {
-//		System.out.println("setScore :: pinsByPlayer [" + curPlayer + "] " + "[" + curFrame + "] " + "[" + curRoll + "] = " + curPins);
-		
 		pinsByPlayer[curPlayer][curFrame][curRoll] = curPins;
 	}
 
@@ -75,39 +72,48 @@ public class ScoreBoard {
 	}
 	
 	public HashMap<String, Object> clearEntry() {
-		if(list.size() == 0) {
+		//첫 칸일 때 되돌리기
+		if(list.size() == 0) { 
 			return null;
 		}
 		
 		HashMap<String, Object> map = new HashMap<>();
 		
+		//가장 최근에 던진 정보 가져오기
 		int curPlayer = (int) list.get(list.size()-1).get("curPlayer");
 		int curFrame = (int) list.get(list.size()-1).get("curFrame");
 		int curRoll = (int) list.get(list.size()-1).get("curRoll");
 		
+		//가장 최근에 던진 정보 초기화
 		pinsByPlayer[curPlayer][curFrame][curRoll] = -1;
 		scoreByPlayer[curPlayer][seqByPlayer[curPlayer]-1] = 0;
 		seqByPlayer[curPlayer]--;
 		list.remove(list.size()-1);
 		
+		//가장 최근에 던진 정보 담기
 		map.put("curPlayer", curPlayer);
 		map.put("curFrame", curFrame);
 		map.put("curRoll", curRoll);
 		
+		//이전 내용이 있는지 체크
 		if(list.size() == 0) {
 			return map;
 		}
 		
+		//이전에 던진 정보 가져오기
 		int prePlayer = (int) list.get(list.size()-1).get("curPlayer");
 		int preFrame = (int) list.get(list.size()-1).get("curFrame");
 		int preRoll = (int) list.get(list.size()-1).get("curRoll");
 		
+		//이전에 던진 점수 가져오기
 		int prePins = pinsByPlayer[prePlayer][preFrame][preRoll];
 		
+		//이전 점수 담기
 		map.put("prePins", prePins);
 		
 		return map;
 	}
+	
 	public int getFinalScore(int curPlayer) {
 		int score = 0;
 		int firstRollInFrame = 0;
@@ -185,9 +191,9 @@ public class ScoreBoard {
 			
 		return scoreByFrame;
 	}
-	
+
 	public boolean isSpare(int curPlayer, int firstRollInFrame) {
-		return nextBallsForFrame(curPlayer, firstRollInFrame) == 10;
+		return scoreByPlayer[curPlayer][firstRollInFrame] + scoreByPlayer[curPlayer][firstRollInFrame + 1] == 10;
 	}
 	
 	public boolean isStrike(int curPlayer, int firstRollInFrame) {
@@ -205,8 +211,4 @@ public class ScoreBoard {
 	public int nextBallsForFrame(int curPlayer, int firstRollInFrame) {
 		return scoreByPlayer[curPlayer][firstRollInFrame] + scoreByPlayer[curPlayer][firstRollInFrame + 1];
 	}
-
-	
-
-	
 }

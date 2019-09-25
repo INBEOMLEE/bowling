@@ -11,7 +11,6 @@ import com.bowling.dao.BowlingDAO;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class BowlingServiceImpl implements BowlingService{
 	ScoreBoard scoreBoard = new ScoreBoard();
@@ -30,14 +29,10 @@ public class BowlingServiceImpl implements BowlingService{
 	}
 	
 	@Override
-	public HashMap<String, Object> setScore(int curPlayer, int curFrame, int curRoll, int curPins) {
-		HashMap<String, Object> map = new HashMap<>();
-		
+	public void setScore(int curPlayer, int curFrame, int curRoll, int curPins) {
 		scoreBoard.setScore(curPlayer, curFrame, curRoll, curPins);
 		scoreBoard.roll(curPlayer, curPins);
 		scoreBoard.recordEntry(curPlayer, curFrame, curRoll);
-		
-		return map;
 	}
 	
 	@Override

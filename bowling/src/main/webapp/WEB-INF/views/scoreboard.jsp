@@ -31,7 +31,7 @@
 	.score_box_outline {
 		width: 95%;
 		height: 10%;
-		margin: 10px auto;
+		margin: 20px auto;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -42,12 +42,9 @@
 		border-spacing: 0px;
 	}
 	
-	.scoreboard th {
-		font-size: 20px;
-	}
-	
 	.scoreboard th, td {
 		border: 1px solid white;
+		font-size: 20px;
 	}
 	
 	.scoreboard tr {
@@ -67,7 +64,6 @@
 		font-size: 18px;
 		font-weight: 600; 
 		background: white;
-		color: black;
 		border-radius: 20px;
 		cursor: pointer;
 		box-shadow: 5px 5px 5px black;
@@ -81,16 +77,35 @@
 		text-align: center; 	
 	}
 	
-	.error_message {
-		font-size: 20px;
-		font-weight: 600;
-		text-align: center;
-		color: tomato;
-		margin-top: 60px;
-		visibility: hidden;
-	}
 	.scoreboard th{
 		background: red;
+	}
+	
+	.auto_btn_box {
+		height: 60px;
+		margin-top: 20px;
+		text-align: right;
+	}
+	
+	.auto_box {
+		width: 90%;
+		height: 60px;
+		margin: 0 auto;
+	}
+	
+	.auto_box button {
+		outline: none;
+		background: white;
+		border-radius: 20px;
+		height: 60px;
+		width: 140px;
+		color: #353535;
+		border: none;
+		font-size: 18px;
+		font-weight: 600;
+		box-shadow: 5px 5px 5px black;
+		margin-right: 20px;
+		cursor: pointer;
 	}
 	
 </style>
@@ -118,7 +133,7 @@
 				<tbody>
 					<c:forEach items="${list}" var="name" varStatus="status">
 						<tr>
-							<td rowspan="2" style="text-align: center; font-size: 25px;">${name}</td>
+							<td rowspan="2" style="text-align: center">${name}</td>
 							<td id="pins<c:out value="${status.index}"/>00" class="pins_box" style="width: 4%"></td>
 							<td id="pins<c:out value="${status.index}"/>01" class="pins_box" style="width: 4%"></td>
 							<td id="pins<c:out value="${status.index}"/>10" class="pins_box" style="width: 4%"></td>
@@ -140,25 +155,32 @@
 							<td id="pins<c:out value="${status.index}"/>90" class="pins_box" style="width: 4%"></td>
 							<td id="pins<c:out value="${status.index}"/>91" class="pins_box" style="width: 4%"></td>
 							<td id="pins<c:out value="${status.index}"/>92" class="pins_box" style="width: 4%"></td>
-							<td rowspan="2" id="total_score<c:out value="${status.index}"/>"></td>
+							<td rowspan="2" id="total_score<c:out value="${status.index}"/>" class="pins_box"></td>
 						</tr>
 						<tr>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>0"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>1"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>2"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>3"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>4"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>5"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>6"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>7"></td>
-							<td colspan="2" class="frame<c:out value="${status.index}"/>8"></td>
-							<td colspan="3" class="frame<c:out value="${status.index}"/>9"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>0 pins_box"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>1 pins_box"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>2 pins_box"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>3 pins_box"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>4 pins_box"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>5 pins_box"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>6 pins_box"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>7 pins_box"></td>
+							<td colspan="2" class="frame<c:out value="${status.index}"/>8 pins_box"></td>
+							<td colspan="3" class="frame<c:out value="${status.index}"/>9 pins_box"></td>
 						</tr>
 					</c:forEach>				
 				</tbody>
 			</table>
 		</div>
-		<div class="error_message">한 프레임에 두번의 투구가 10점을 넘을 수 없습니다.</div>
+		<div class="auto_btn_box">
+			<div class="auto_box">
+				<button class="auto_btn">ALL ONES</button>
+				<button class="auto_btn">ALL SPARE</button>
+				<button class="auto_btn">ALL STRIKE</button>
+				<button class="auto_btn">ALL RANDOM</button>
+			</div>
+		</div>
 		<div class="score_box_outline">
 			<div class="score_box">
 				<button class="score_btn">0</button>
@@ -183,73 +205,100 @@
 	$(document).ready(function(){
 		arrayReset();
 		
+		var maxRoll = "${player}" * 21; 
 		var player = "${player}" - 1;
 		var curPlayer = 0;
 		var curFrame = 0;
 		var curRoll = 0;
+		var curPins = 0;
 		var theEnd = 0;
 		var flag = 0;
 		
 		$('.score_btn').click(function(){
-			var curPins = $(this).text();
+			curPins = $(this).text();
+			
 			bowlingAction(curPins);
 		});
 		
 		$('.command_btn').click(function(){
 			var text = $(this).text();
+			
 			if(text == "CE") {
-				$.ajax({
-					type:"post",
-					url: "${path}/bowling/clearEntry",
-					async: false,
-					success: function(data){
-						$('#pins'+curPlayer+curFrame+curRoll).css("background", "none");
-						$('.score_btn').css('visibility', 'visible');
-						if(curRoll == 0) {
-							$('#total_score'+(curPlayer-1)).css('font-size', '25px').text("");
-						} else {
-							$('#total_score'+curPlayer).css('font-size', '25px').text("");
-						}
-						
-						theEnd = 0;
-						flag = 0;
-						
-						if(data == null || data == ""){
-							curPlayer = 0;
-							curFrame = 0;
-							curRoll = 0;
-						} else {
-							curPlayer = data.curPlayer;
-							curFrame = data.curFrame;
-							curRoll = data.curRoll;
-							
-							getFrameScore();
-							$('#pins'+curPlayer+curFrame+curRoll).css("background", "red").text("");
-							
-							setRollRange(data.prePins);
-						}
-						
-					},
-					error: function(){
-						console.log('AJAX FAIL : clearEntry');
-					}
-				});
+				clearEntryAction();
+			} else if(text == "AC") {
+				allClearAction();
 			}
 			
+		});
+		
+		$('.auto_btn').click(function(){
+			if(theEnd == 1) {
+				return;
+			}
 			
-		});		
-		function arrayReset() {
-			$.ajax({
-				type:"post",
-				url: "${path}/bowling/arrayReset",
-				success: function(){
-					console.log('AJAX SUCCESS : ARRAY RESET');
-				},
-				error: function(){
-					console.log('AJAX FAIL : ARRAY RESET');
+			var btnText = $(this).text();
+			var btnTextArr = btnText.split(" ");
+			
+			if(btnTextArr[1] == 'ONES') {
+				for (var i = 0; i < maxRoll; i++) {
+					bowlingAction(1);
+					
+					if(theEnd == 1) {
+						break;
+					}
 				}
-			});	
-		}
+			} else
+				
+			if(btnTextArr[1] == 'SPARE') {
+				if(curRoll == 1 && curPins > 5) {
+					return;
+				}
+				
+				for (var i = 0; i < maxRoll; i++) {
+					bowlingAction(5);
+					
+					if(theEnd == 1) {
+						break;
+					}
+				}
+			} else
+			
+			if(btnTextArr[1] == 'STRIKE') {
+				if(curRoll == 1 && curPins > 0) {
+					return;
+				}
+				
+				for (var i = 0; i < maxRoll; i++) {
+					bowlingAction(10);
+					
+					if(theEnd == 1) {
+						break;
+					}
+				}
+			} else
+				
+			if(btnTextArr[1] == 'RANDOM') {
+				for (var i = 0; i < maxRoll; i++) {
+					
+					if(curRoll == 1 && curPins != 10) {
+						var pinsRange = 11 - curPins;
+						console.log("이전 점수 : " + curPins);
+						curPins = Math.floor(Math.random() * pinsRange);
+						console.log("현재 점수 : " + curPins);
+						
+					} else {
+						curPins = Math.floor(Math.random() * 11);
+					}
+					
+					bowlingAction(curPins);
+					
+					if(theEnd == 1) {
+						break;
+					}
+					
+				}
+			}
+		});
 		
 		function bowlingAction(curPins){		
 			$.ajax({
@@ -259,12 +308,10 @@
 				dataType: "text",
 				data: "curPlayer=" + curPlayer + "&curFrame=" + curFrame + "&curRoll=" + curRoll + "&curPins=" + curPins,
 				success: function(){
-					console.log('AJAX SUCCESS : BOWLING ACTION');
-					
 					// 점수 입력 부분
 					setScore(curPins);
 					
-					// 프레임 점수 입력 부분
+					// 프레임 점수 처리 부분
 					getFrameScore();
 					
 					// 다음 순서 처리 부분
@@ -279,13 +326,92 @@
 			});	
 		}
 		
+		function clearEntryAction() {
+			$.ajax({
+				type:"post",
+				url: "${path}/bowling/clearEntry",
+				async: false,
+				success: function(data){
+					// 다음 입력되는 곳 배경색 none
+					$('#pins'+curPlayer+curFrame+curRoll).css("background", "none");
+					flag = 0;
+					
+					// 모든 점수 버튼 visible
+					$('.score_btn').css('visibility', 'visible');
+					theEnd = 0;
+					
+					// 플레이어별 최종점수 공백 처리
+					if(curRoll == 0) {
+						$('#total_score'+(curPlayer-1)).text("");
+					} else {
+						$('#total_score'+curPlayer).text("");
+					}
+					
+					if(data == null || data == ""){
+						// 다음 순서 처리
+						curPlayer = 0;
+						curFrame = 0;
+						curRoll = 0;
+						curPins = 0;
+						
+					} else {
+						// 다음 순서 처리
+						curPlayer = data.curPlayer;
+						curFrame = data.curFrame;
+						curRoll = data.curRoll;
+						curPins = data.prePins;
+						
+						// 프레임 점수 처리
+						getFrameScore();
+						
+						// 다음 입력되는 곳 배경색 red
+						$('#pins'+curPlayer+curFrame+curRoll).css("background", "red").text("");
+						
+						// 점수 버튼 활성화 처리
+						setRollRange(data.prePins);
+					}
+					
+				},
+				error: function(){
+					console.log('AJAX FAIL : clearEntry');
+				}
+			});
+		}
+		
+		function allClearAction() {
+			arrayReset();
+			
+			$('#pins'+curPlayer+curFrame+curRoll).css("background", "none");
+			$('.score_btn').css('background', 'white').css('box-shadow', '7px 7px 7px black').css('cursor', 'pointer').css('visibility', 'visible').attr('disabled', false);
+			$('.pins_box').text("");
+			
+			curPlayer = 0;
+			curFrame = 0;
+			curRoll = 0;
+			theEnd = 0;
+			flag = 0;
+		}
+		
+		function arrayReset() {
+			$.ajax({
+				type:"post",
+				url: "${path}/bowling/arrayReset",
+				success: function(){
+					console.log('AJAX SUCCESS : ARRAY RESET');
+				},
+				error: function(){
+					console.log('AJAX FAIL : ARRAY RESET');
+				}
+			});	
+		}
+		
 		function setScore(curPins){
-			if(curRoll == 1 && Number($('#pins'+curPlayer+curFrame+(curRoll-1)).text()) + Number(curPins) == 10) {
-				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').css('font-size', '30px').text('/');
-			} else if(curPins == 10) {
-				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').css('font-size', '30px').text('X');
+			if(isSpare(curPins)) {
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('/');
+			} else if(isStrike(curPins)) {
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('X');
 			} else {
-				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').css('font-size', '25px').text(curPins);
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text(curPins);
 			}
 		}
 		
@@ -297,16 +423,17 @@
 				dataType: "json",
 				data: "curPlayer=" + curPlayer,
 				success: function(data){
-					console.log('AJAX SUCCESS : GET FRAME SCORE');
-					for (var i = 0; i < data.length; i++) {
-						for (var j = 0; j < data[i].length; j++) {
-							if(data[i][j] == '-1') {
-								$('.frame'+i+j).text("");
+					
+					for (var player = 0; player < data.length; player++) {
+						for (var frame = 0; frame < data[player].length; frame++) {
+							if(data[player][frame] == '-1') {
+								$('.frame'+player+frame).text("");
 							} else {
-								$('.frame'+i+j).text(data[i][j]);
+								$('.frame'+player+frame).text(data[player][frame]);
 							}
 						}
 					}
+					
 				},
 				error: function(){
 					console.log('AJAX FAIL : GET FRAME SCORE');
@@ -316,7 +443,28 @@
 		
 		function setNextTrun(curPins){
 			if(curFrame < 9) {
-				if(curPins == 10) {
+				calcTurnOfFrame(curPins);
+			} else if(curFrame == 9) {
+				calcTurnOfTenthFrame(curPins);
+			}
+			
+			if(flag != 1){
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'red');
+			}
+		}
+		
+		function calcTurnOfFrame(curPins) {
+			if(isStrike(curPins)) {
+				if(curPlayer == player){
+					curPlayer = 0;
+					curFrame++;
+					curRoll = 0;
+				} else {
+					curPlayer++;
+					curRoll = 0;
+				}
+			} else {
+				if(curRoll == 1) {
 					if(curPlayer == player){
 						curPlayer = 0;
 						curFrame++;
@@ -326,53 +474,38 @@
 						curRoll = 0;
 					}
 				} else {
-					if(curRoll == 1) {
-						if(curPlayer == player){
-							curPlayer = 0;
-							curFrame++;
-							curRoll = 0;
-						} else {
-							curPlayer++;
-							curRoll = 0;
-						}
-					} else {
-						curRoll++;
-					}
-				}
-			} else {
-				if(curRoll == 1 && Number($('#pins'+curPlayer+'90').text()) + Number(curPins) < 10) {
-					if(curPlayer == player) {
-						$('.score_btn').css('visibility', 'hidden');
-						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
-						getFinalScore();
-						flag = 1;
-					} else {
-						getFinalScore();
-						curPlayer++;
-						curRoll = 0;
-					}
-					
-					theEnd = 1;
-				} else if(curRoll == 2) {
-					if(curPlayer == player) {
-						$('.score_btn').css('visibility', 'hidden');
-						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
-						getFinalScore();
-						flag = 1;
-					} else {
-						getFinalScore();
-						curPlayer++;
-						curRoll = 0;
-					}
-					
-					theEnd = 1;
-				} else {
 					curRoll++;
 				}
 			}
-			
-			if(flag != 1){
-				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'red');
+		}
+		
+		function calcTurnOfTenthFrame(curPins) {
+			if(curRoll == 1 && isNormal(curPins)) {
+				if(curPlayer == player) {
+					$('.score_btn').css('visibility', 'hidden');
+					$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
+					getFinalScore();
+					theEnd = 1;
+					flag = 1;
+				} else {
+					getFinalScore();
+					curPlayer++;
+					curRoll = 0;
+				}
+			} else if(curRoll == 2) {
+				if(curPlayer == player) {
+					$('.score_btn').css('visibility', 'hidden');
+					$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
+					getFinalScore();
+					theEnd = 1;
+					flag = 1;
+				} else {
+					getFinalScore();
+					curPlayer++;
+					curRoll = 0;
+				}
+			} else {
+				curRoll++;
 			}
 		}
 		
@@ -416,14 +549,25 @@
 				async: false,
 				dataType: "text",
 				data: "curPlayer=" + curPlayer,
-				success: function(finalScore){
-					$('#total_score'+curPlayer).css('font-size', '25px').text(finalScore);
-					theEnd = 0;
+				success: function(data){
+					$('#total_score'+curPlayer).text(data);
 				},
 				error: function(){
 					console.log('AJAX FAIL : GET FINAL SCORE');
 				}
 			});	
+		}
+		
+		function isSpare(curPins) {
+			return curRoll == 1 && Number($('#pins'+curPlayer+curFrame+(curRoll-1)).text()) + Number(curPins) == 10
+		}
+		
+		function isStrike(curPins) {
+			return curPins == 10
+		}
+		
+		function isNormal(curPins) {
+			return Number($('#pins'+curPlayer+'90').text()) + Number(curPins) < 10
 		}
 	});
 

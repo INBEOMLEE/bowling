@@ -16,16 +16,6 @@ public class ScoreBoardTest {
 		scoreBoard.roll(player, 0);
 	}
 	
-	private void rollMany(int pins, int frames) {
-		for (int i = 0; i < frames; i++) 
-			scoreBoard.roll(player, pins);
-	}
-	
-	private void rollSpare() {
-		scoreBoard.roll(player, 5);
-		scoreBoard.roll(player, 5);
-	}
-	
 	@Test
 	public void gutterGame() {
 		rollMany(0, 20);
@@ -54,10 +44,6 @@ public class ScoreBoardTest {
 		rollMany(0, 16);
 		assertEquals(26, scoreBoard.getFinalScore(player));
 	}
-
-	private void rollStrike() {
-		scoreBoard.roll(player, 10);
-	}
 	
 	@Test
 	public void perfectRoll() {
@@ -76,5 +62,18 @@ public class ScoreBoardTest {
 		assertEquals(150, scoreBoard.getFinalScore(player));
 		
 	}
-
+	
+	private void rollMany(int pins, int frames) {
+		for (int i = 0; i < frames; i++) 
+			scoreBoard.roll(player, pins);
+	}
+	
+	private void rollStrike() {
+		scoreBoard.roll(player, 10);
+	}
+	
+	private void rollSpare() {
+		scoreBoard.roll(player, 5);
+		scoreBoard.roll(player, 5);
+	}
 }

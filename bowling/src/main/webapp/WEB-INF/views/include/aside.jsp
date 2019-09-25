@@ -33,7 +33,7 @@
 	}
 	.aside_menu {
 		width: 100%;
-		margin: 100px auto 0;
+		margin: 140px auto 0;
 		height: 400px;
 		display: flex;
 		justify-content: center;

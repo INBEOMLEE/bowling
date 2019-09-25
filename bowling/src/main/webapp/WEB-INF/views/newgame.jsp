@@ -53,22 +53,26 @@
 		margin: 120px 0 100px;
 	}
 	
-	.player_many_input_box {
+	.player_many_btn_box {
 		text-align: center;
 		display: inline-block;
 		width: 100%;
+		margin-top: 150px;
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
 	}
 	
-	.player_many_input {
-		width: 180px;
-		border: 1px solid white;
-		font-size: 120px;
-		margin: 0 auto;
-		height: 120px;
-		color: black;
-		text-align: center;
-		border-radius: 10px;
-		
+	.player_many_btn {
+		width: 20%;
+		height: 80px;
+		background: white;
+		border: none;
+		font-size: 30px;
+		font-weight: 600;
+		color: #353535;
+		border-radius: 20px;
+		cursor: pointer;
 	}
 	
 	.error_message_box {
@@ -83,15 +87,16 @@
 	}
 	
 	.player_name_box {
-		height: 51%;
+		height: 60%;
 		width: 90%;
-		margin-top: 40px;
 	}
 	
 	.message {
+		margin-top: 240px;
 		font-size: 25px;
 		text-align: center;
-		margin-top: 130px;
+		display: block;
+		font-weight: 600;
 	}
 	
 	.form {
@@ -101,7 +106,7 @@
 		justify-content: space-evenly;
 		align-items: center;
 		flex-direction: column;
-		margin-top: 10px;
+		margin-top: 35px;
 	}
 	
 	.player_name_input_box {
@@ -145,11 +150,11 @@
 		<div class="player_check">	
 			<div class="player_many">
 				<div class="player_title">플레이어 수를 입력해주세요</div>
-				<div class="player_many_input_box">
-					<input type="text" name="player_many" class="player_many_input" maxlength="1"> 
-				</div>
-				<div class="error_message_box">
-					<div class="error_message">숫자만 입력 가능합니다</div>
+				<div class="player_many_btn_box">
+					<button class="player_many_btn">1</button>
+					<button class="player_many_btn">2</button>
+					<button class="player_many_btn">3</button>
+					<button class="player_many_btn">4</button>
 				</div>
 			</div>
 			<div class="player_name">
@@ -170,48 +175,25 @@
 </body>
 <script type="text/javascript">
 $(document).ready(function(){
-	var playerCheck = false;
 	var playerMany = 0;
 	
-	$('.player_many_input').keyup(function(){
-		var regNumber = /^[0-9]*$/;
-		playerMany = $(this).val();
+	$('.player_many_btn').click(function(){
+		playerMany = $(this).text();
+		
+		$('.message').css('display', 'none');
 		
 		$('.form').html("");
-		
-		if(!regNumber.test(playerMany)){
-			$('.error_message').eq(0).text("숫자만 입력 가능합니다.").css('display', 'block');
-			$('.message').css('display', 'block');
-			$(this).select();
-			playerCheck = false;
-			return;
-		} else if(1 > playerMany || playerMany > 4) {
-			$('.error_message').eq(0).text("1 부터 4 까지 입력 가능합니다.").css('display', 'block');
-			$('.message').css('display', 'block');
-			$(this).select();
-			playerCheck = false;
-			return;
-		} else {
-			$('.error_message').eq(0).text("").css('display', 'none');
-			$('.message').css('display', 'none');
-			playerCheck = true;
-		} 
-		
-		if(playerCheck) {
-			for (var i = 0; i < playerMany; i++) {
-				$('.form').append("<div class='player_name_input_box'><input type='text' name='player_name_"+ i +"' class='player_name_input' placeholder='이름' maxlength='4'></div>");
-				if(i == (playerMany-1)) {
-					$('.form').append("<input type='hidden' class='player' name='player' value="+ playerMany +">")
-				}
+		for (var i = 0; i < playerMany; i++) {
+			$('.form').append("<div class='player_name_input_box'><input type='text' name='player_name_"+ i +"' class='player_name_input' placeholder='이름' maxlength='4'></div>");
+			if(i == (playerMany-1)) {
+				$('.form').append("<input type='hidden' class='player' name='player' value="+ playerMany +">")
 			}
 		}
 	});
 	
 	$('.player_btn').click(function(){
-		var regName = /^[가-힣]{2,4}$/;
-		
-		if(!playerCheck) {
-			$('.error_message').eq(1).text("플레이어 수 입력을 확인해주세요.").css('display', 'block');
+		if(playerMany == 0) {
+			$('.error_message').text("플레이어 수를 입력해주세요.").css('display', 'block');
 			return;
 		}
 		
@@ -219,15 +201,22 @@ $(document).ready(function(){
 			var nameVal = $('.player_name_input').eq(i).val();
 			
 			if(nameVal == null || nameVal == "") {
-				$('.error_message').eq(1).text((i+1) + "번째 플레이어 이름을 입력해주세요.").css('display', 'block');
+				$('.error_message').text((i+1) + "번째 플레이어 이름을 입력해주세요.").css('display', 'block');
 				$('.player_name_input').eq(i).focus();
 				return;
-			} else if(!regName.test(nameVal)) {
-				$('.error_message').eq(1).text("플레이어 이름은 완성된 한글 2~4자로 입력해주세요.").css('display', 'block');
-				$('.player_name_input').eq(i).select();
-				return;
+			}
+			
+		}
+		
+		for (var i = 0; i < playerMany; i++) {
+			for (var j = i+1; j < playerMany; j++) {
+				if($('.player_name_input').eq(i).val() == $('.player_name_input').eq(j).val()) {
+					$('.error_message').text("같은 이름의 플레이어가 존재합니다.").css('display', 'block');
+					return;
+				}
 			}
 		}
+		
 		
 		$('.error_message').eq(1).text("").css('display', 'none');
 		
