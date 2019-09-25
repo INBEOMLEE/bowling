@@ -193,10 +193,6 @@
 		$('.score_btn').click(function(){
 			var curPins = $(this).text();
 			bowlingAction(curPins);
-			
-			if(theEnd == 1){
-				getFinalScore();
-			}
 		});
 		
 		$('.command_btn').click(function(){
@@ -209,9 +205,12 @@
 					success: function(data){
 						$('#pins'+curPlayer+curFrame+curRoll).css("background", "none");
 						$('.score_btn').css('visibility', 'visible');
-						$('#total_score'+(curPlayer)).css('font-size', '25px').text("");
+						if(curRoll == 0) {
+							$('#total_score'+(curPlayer-1)).css('font-size', '25px').text("");
+						} else {
+							$('#total_score'+curPlayer).css('font-size', '25px').text("");
+						}
 						
-						/* curPlayer++; 해준부분과 꼬여서 지금 마지막 점수 지워지는게 비정상적이다. */
 						theEnd = 0;
 						flag = 0;
 						
@@ -345,9 +344,10 @@
 					if(curPlayer == player) {
 						$('.score_btn').css('visibility', 'hidden');
 						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
-						curPlayer++;
+						getFinalScore();
 						flag = 1;
 					} else {
+						getFinalScore();
 						curPlayer++;
 						curRoll = 0;
 					}
@@ -357,9 +357,10 @@
 					if(curPlayer == player) {
 						$('.score_btn').css('visibility', 'hidden');
 						$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
-						curPlayer++;
+						getFinalScore();
 						flag = 1;
 					} else {
+						getFinalScore();
 						curPlayer++;
 						curRoll = 0;
 					}
@@ -412,11 +413,11 @@
 			$.ajax({
 				type:"post",
 				url: "${path}/bowling/getFinalScore",
+				async: false,
 				dataType: "text",
-				data: "curPlayer=" + (curPlayer-1),
+				data: "curPlayer=" + curPlayer,
 				success: function(finalScore){
-					console.log('AJAX SUCCESS : GET FINAL SCORE');
-					$('#total_score'+(curPlayer-1)).css('font-size', '25px').text(finalScore);
+					$('#total_score'+curPlayer).css('font-size', '25px').text(finalScore);
 					theEnd = 0;
 				},
 				error: function(){
