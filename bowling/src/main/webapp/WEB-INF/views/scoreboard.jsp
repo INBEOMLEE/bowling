@@ -212,7 +212,6 @@
 		var curRoll = 0;
 		var curPins = 0;
 		var theEnd = 0;
-		var flag = 0;
 		
 		$('.score_btn').click(function(){
 			curPins = $(this).text();
@@ -334,7 +333,6 @@
 				success: function(data){
 					// 다음 입력되는 곳 배경색 none
 					$('#pins'+curPlayer+curFrame+curRoll).css("background", "none");
-					flag = 0;
 					
 					// 모든 점수 버튼 visible
 					$('.score_btn').css('visibility', 'visible');
@@ -389,7 +387,6 @@
 			curFrame = 0;
 			curRoll = 0;
 			theEnd = 0;
-			flag = 0;
 		}
 		
 		function arrayReset() {
@@ -410,6 +407,8 @@
 				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('/');
 			} else if(isStrike(curPins)) {
 				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('X');
+			} else if(isGutter(curPins)) {
+				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text('-');
 			} else {
 				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none').text(curPins);
 			}
@@ -448,7 +447,7 @@
 				calcTurnOfTenthFrame(curPins);
 			}
 			
-			if(flag != 1){
+			if(theEnd != 1){
 				$('#pins'+curPlayer+curFrame+curRoll).css('background', 'red');
 			}
 		}
@@ -486,7 +485,6 @@
 					$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
 					getFinalScore();
 					theEnd = 1;
-					flag = 1;
 				} else {
 					getFinalScore();
 					curPlayer++;
@@ -498,7 +496,6 @@
 					$('#pins'+curPlayer+curFrame+curRoll).css('background', 'none');
 					getFinalScore();
 					theEnd = 1;
-					flag = 1;
 				} else {
 					getFinalScore();
 					curPlayer++;
@@ -550,12 +547,19 @@
 				dataType: "text",
 				data: "curPlayer=" + curPlayer,
 				success: function(data){
+					if(data != $('.frame'+curPlayer+'9').text()) {
+						data = $('.frame'+curPlayer+'9').text();
+					}
+					
 					$('#total_score'+curPlayer).text(data);
 				},
 				error: function(){
 					console.log('AJAX FAIL : GET FINAL SCORE');
 				}
 			});	
+		}
+		function isGutter(curPins) {
+			return curPins == 0
 		}
 		
 		function isSpare(curPins) {
