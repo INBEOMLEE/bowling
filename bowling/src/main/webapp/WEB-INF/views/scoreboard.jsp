@@ -571,6 +571,10 @@
 		}
 		
 		function isNormal(curPins) {
+			if($('#pins'+curPlayer+'90').text() == '-') {
+				return 0 + Number(curPins) < 10;
+			}
+			
 			return Number($('#pins'+curPlayer+'90').text()) + Number(curPins) < 10
 		}
 	});

@@ -33,7 +33,7 @@
 	}
 	.aside_menu {
 		width: 100%;
-		margin: 140px auto 0;
+		margin: 90px auto 0;
 		height: 400px;
 		display: flex;
 		justify-content: center;
@@ -62,7 +62,6 @@
 		<a href="${path}/bowling" class="aside_title">Bowling Game</a>
 		<div class="aside_menu">
 			<a href="${path}/bowling/newgame">새로하기</a>
-			<a href="#">이어하기</a>
 			<a href="#">불러오기</a>
 			<a href="#">순위보기</a>
 		</div>

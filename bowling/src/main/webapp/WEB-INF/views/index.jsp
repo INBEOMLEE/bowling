@@ -36,7 +36,7 @@
 	
 	.main_img img {
 		border-radius: 30px;
-		margin-top: 50px;
+		margin-top: 10px;
 	}
 
 </style>

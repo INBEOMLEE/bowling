@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ScoreBoard {
+public class CalcScore {
 	private final int MAX_ALLFRAME_ROLL = 21;
 	private final int MAX_FRAME_ROLL = 3;
 	private final int MAX_PLAYER = 4;

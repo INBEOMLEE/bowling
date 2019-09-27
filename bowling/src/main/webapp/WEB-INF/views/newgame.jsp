@@ -57,7 +57,7 @@
 		text-align: center;
 		display: inline-block;
 		width: 100%;
-		margin-top: 150px;
+		margin-top: 105px;
 		display: flex;
 		justify-content: space-evenly;
 		align-items: center;
@@ -92,7 +92,7 @@
 	}
 	
 	.message {
-		margin-top: 240px;
+		margin-top: 175px;
 		font-size: 25px;
 		text-align: center;
 		display: block;
