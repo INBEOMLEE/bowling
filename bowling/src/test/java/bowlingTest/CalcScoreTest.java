@@ -11,6 +11,8 @@ public class CalcScoreTest {
 	CalcScore calcScore = new CalcScore();
 	int player = 0;
 	
+	
+	
 	//입력한 점수 확인
 	@Test
 	public void canRoll() {
@@ -68,6 +70,16 @@ public class CalcScoreTest {
 		calcScore.roll(player, 10);
 		assertEquals(300, calcScore.getFinalScore(player));
 	}
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
 	
 	private void rollMany(int pins, int frames) {
 		for (int i = 0; i < frames; i++) 

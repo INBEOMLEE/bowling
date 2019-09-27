@@ -281,10 +281,7 @@
 					
 					if(curRoll == 1 && curPins != 10) {
 						var pinsRange = 11 - curPins;
-						console.log("이전 점수 : " + curPins);
 						curPins = Math.floor(Math.random() * pinsRange);
-						console.log("현재 점수 : " + curPins);
-						
 					} else {
 						curPins = Math.floor(Math.random() * 11);
 					}
